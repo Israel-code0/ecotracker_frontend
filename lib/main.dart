@@ -34,37 +34,15 @@ class EcoTrackerApp extends StatelessWidget {
       ),
       // Wrapped in a Consumer to monitor real-time authentication state changes
       home: Consumer<AuthProvider>(
-        builder: (context, authProvider, _) {
-          // 1. If the provider already has an active, valid memory state, load Dashboard instantly
-          if (authProvider.isAuthenticated) {
-            return const DashboardScreen();
-          }
-
-          // 2. Otherwise, check physical hardware storage for old user sessions
-          return FutureBuilder<bool>(
-            future: authProvider.tryAutoLogin(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2E7D32)),
-                    ),
-                  ),
-                );
-              }
-              
-              // If auto-login recovers a session token, it triggers consumer to load dashboard.
-              // Otherwise, safely fallback to the Auth login portal screen.
-              if (snapshot.data == true) {
-                return const DashboardScreen();
-              } else {
-                return const AuthScreen();
-              }
-            },
-          );
-        },
-      ),
+          builder: (context, authProvider, _) {
+            // Clean, instantaneous routing without the FutureBuilder loop!
+            if (authProvider.isAuthenticated) {
+              return const DashboardScreen();
+            } else {
+              return const AuthScreen(); // (or LoginScreen, depending on your naming)
+            }
+          },
+        ),
     );
   }
 }

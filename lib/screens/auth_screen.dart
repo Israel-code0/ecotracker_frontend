@@ -20,6 +20,18 @@ class _AuthScreenState extends State<AuthScreen> {
   final _goalController = TextEditingController(text: "4000");
 
   @override
+  void initState() {
+    super.initState();
+    // Run the storage check once silently in the background when the screen boots
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).tryAutoLogin().then((isLoggedIn) {
+        // We do not need a manual navigator push here because your main.dart 
+        // Consumer will automatically detect the state change and route you!
+      });
+    });
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
