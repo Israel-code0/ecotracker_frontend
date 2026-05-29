@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'dashboard_screen.dart';
+import 'forgot_password_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -135,9 +136,41 @@ class _AuthScreenState extends State<AuthScreen> {
                         decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder(), prefixIcon: Icon(Icons.lock)),
                         validator: (v) => v == null || v.length < 6 ? 'Password must be at least 6 characters' : null,
                       ),
-                      const SizedBox(height: 16),
+                      
+                      // --- FORGOT PASSWORD BUTTON LOGIC ---
+                      if (_isLoginMode) ...[
+                        const SizedBox(height: 8), 
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(50, 30),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: Color(0xFF2D6A4F), 
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
 
                       if (!_isLoginMode) ...[
+                        const SizedBox(height: 16),
                         TextFormField(
                           controller: _goalController,
                           keyboardType: TextInputType.number,

@@ -124,7 +124,7 @@ class _LogActivitySheetState extends State<LogActivitySheet> {
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('❌ Error saving transaction. Check your connection.'), backgroundColor: Colors.redAccent),
+                          const SnackBar(content: Text('❌ Error saving activity. Check your connection.'), backgroundColor: Colors.redAccent),
                         );
                       }
                     }
