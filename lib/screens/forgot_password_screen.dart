@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -17,7 +19,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final Color primaryGreen = const Color(0xFF2D6A4F);
   final Color charcoal = const Color(0xFF1A1A1A);
 
-  // Simulated Backend Call (You will connect this to AuthProvider later)
+  // Simulated Backend Call
   void _submitResetRequest() async {
     if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -28,13 +30,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     setState(() => _isLoading = true);
 
-    // TODO: Replace with actual Provider call: await Provider.of<AuthProvider>(context, listen: false).requestPasswordReset(email);
-    await Future.delayed(const Duration(seconds: 2)); 
+    // The Real Backend Call
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool success = await authProvider.requestPasswordReset(_emailController.text.trim());
 
-    setState(() {
-      _isLoading = false;
-      _isSent = true;
-    });
+    setState(() => _isLoading = false);
+
+    if (success) {
+      setState(() => _isSent = true); // Triggers the success UI
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(authProvider.errorMessage ?? 'Request failed'), backgroundColor: Colors.redAccent),
+        );
+      }
+    }
   }
 
   @override

@@ -109,6 +109,49 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+    /// Requests a password reset OTP to be sent to the user's email
+    Future<bool> requestPasswordReset(String email) async {
+        _errorMessage = null;
+        
+        try {
+        final response = await _dio.post(
+            '/forgot-password',
+            queryParameters: {'email': email}, // Sent as a URL parameter to match Spring Boot
+        );
+        
+        return response.statusCode == 200;
+        } on DioException catch (e) {
+        _errorMessage = e.response?.data?.toString() ?? "Failed to send reset link.";
+        return false;
+        } catch (e) {
+        _errorMessage = "Network error. Please check your connection.";
+        return false;
+        }
+    }
+
+    /// Submits the 6-digit OTP and new password to the backend
+    Future<bool> verifyAndResetPassword(String token, String newPassword) async {
+        _errorMessage = null;
+        
+        try {
+        final response = await _dio.post(
+            '/reset-password',
+            queryParameters: {
+            'token': token,
+            'newPassword': newPassword,
+            },
+        );
+        
+        return response.statusCode == 200;
+        } on DioException catch (e) {
+        _errorMessage = e.response?.data?.toString() ?? "Invalid or expired code.";
+        return false;
+        } catch (e) {
+        _errorMessage = "Network error. Please check your connection.";
+        return false;
+        }
+    }
+
   /// Clear session state to log out
  Future<void> logout() async {
     _token = null;

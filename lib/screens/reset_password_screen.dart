@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -28,16 +30,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     setState(() => _isLoading = true);
 
-    // TODO: Connect to Provider -> AuthProvider.verifyAndReset(code, newPassword)
-    await Future.delayed(const Duration(seconds: 2)); 
+    // 👇 The Real Backend Call 👇
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool success = await authProvider.verifyAndResetPassword(
+      _codeController.text.trim(),
+      _passwordController.text,
+    );
 
     setState(() => _isLoading = false);
     
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password Reset Successful!'), backgroundColor: Colors.green),
-      );
-      Navigator.popUntil(context, (route) => route.isFirst); // Sends them back to the very first Login screen
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password Reset Successful!'), backgroundColor: Colors.green),
+        );
+        Navigator.popUntil(context, (route) => route.isFirst); // Sends them back to Login
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(authProvider.errorMessage ?? 'Reset failed'), backgroundColor: Colors.redAccent),
+        );
+      }
     }
   }
 
